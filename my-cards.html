@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tarjetas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 200px;
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-front {
+            background: linear-gradient(135deg, #1a237e, #000000);
+            color: white;
+        }
+        .card-back {
+            background: linear-gradient(135deg, #0d47a1, #000000);
+            transform: rotateY(180deg);
+            color: white;
+        }
+        #editModal {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex items-center">
+            <a href="index.html" class="mr-4 text-blue-600">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold">Mis Tarjetas</h1>
+        </div>
+    </header>
+
+    <main class="p-4">
+        <div id="cards-list">
+            <!-- Las tarjetas se cargarán aquí -->
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Inicio</span>
+        </a>
+        <a href="my-cards.html" class="text-blue-600 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">Tarjetas</span>
+        </a>
+        <a href="add-card.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Agregar</span>
+        </a>
+        <a href="my-expenses.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Gastos</span>
+        </a>
+    </nav>
+
+    <!-- Modal de edición -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Editar Tarjeta</h2>
+            <form id="editForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Número</label>
+                    <input type="text" id="editNumber" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Titular</label>
+                    <input type="text" id="editName" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Expiración</label>
+                    <input type="text" id="editExpiry" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Declaración global de funciones
+        function editCard(cardNumber, event) {
+            event.stopPropagation();
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const card = cards.find(c => c.number === cardNumber);
+            
+            if(card) {
+                document.getElementById('editNumber').value = card.number;
+                document.getElementById('editName').value = card.name;
+                document.getElementById('editExpiry').value = card.expiry;
+                currentEditingCard = card;
+                document.getElementById('editModal').classList.remove('hidden');
+                console.log('Modal abierto para:', card.number);
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            currentEditingCard = null;
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newNumber = document.getElementById('editNumber').value;
+            const newName = document.getElementById('editName').value;
+            const newExpiry = document.getElementById('editExpiry').value;
+            
+            if(!newNumber || !newName || !newExpiry) {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const index = cards.findIndex(c => c.number === currentEditingCard.number);
+            
+            if(index !== -1) {
+                cards[index] = {
+                    ...cards[index],
+                    number: newNumber,
+                    name: newName,
+                    expiry: newExpiry,
+                    last4: newNumber.slice(-4)
+                };
+                
+                localStorage.setItem('cards', JSON.stringify(cards));
+                loadCards(); // Recargar la vista
+                closeEditModal();
+            }
+        });
+
+        // Variables para edición
+        let currentEditingCard = null;
+
+        // Función para cargar tarjetas
+        function loadCards() {
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const cardsList = document.getElementById('cards-list');
+            
+            // Datos de ejemplo si no hay tarjetas
+            if(cards.length === 0) {
+                const sampleCards = [
+                    {
+                        number: '4111111111111111',
+                        name: 'Juan Perez',
+                        expiry: '12/25',
+                        cvv: '123',
+                        type: 'visa'
+                    },
+                    {
+                        number: '5555555555554444',
+                        name: 'Maria Lopez',
+                        expiry: '06/24',
+                        cvv: '456',
+                        type: 'mastercard'
+                    }
+                ];
+                localStorage.setItem('cards', JSON.stringify(sampleCards));
+                return loadCards(); // Recargar con datos nuevos
+            }
+
+            cardsList.innerHTML = cards.map(card => `
+                <div class="card-container">
+                    <div class="card" onclick="this.classList.toggle('flipped')">
+                        <div class="card-front ${card.type === 'visa' ? 'bg-gradient-to-br from-blue-900 to-black' : 'bg-gradient-to-br from-red-600 to-yellow-500'}">
+                            <div class="flex justify-between items-center mb-2">
+                                <img src="${card.type === 'visa' ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png' : 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png'}" class="h-8">
+                            </div>
+                            <div class="font-mono text-lg mb-4">${card.number.replace(/(\d{4})(?=\d)/g, '$1 ')}</div>
+                            <div class="text-sm">Expira: ${card.expiry}</div>
+                            <div class="flex-grow"></div>
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-sm opacity-80">Titular</p>
+                                    <p class="font-medium">${card.name.toUpperCase()}</p>
+                                </div>
+                                <button onclick="editCard('${card.number}', event)" 
+                                        class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">
+                                    <i class="fas fa-edit mr-1"></i> Editar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-back ${card.type === 'visa' ? 'bg-gradient-to-br from-blue-800 to-blue-900' : 'bg-gradient-to-br from-red-700 to-red-900'}">
+                            <div class="h-full flex flex-col justify-between">
+                                <div class="bg-black h-8 mt-4"></div>
+                                <div class="text-right">
+                                    <span class="bg-white text-black px-3 py-1 rounded font-mono">CVV: ${card.cvv}</span>
+                                </div>
+                                <div class="text-center">
+                                    <span class="text-gray-300">${card.type === 'visa' ? 'Visa' : 'Mastercard'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCards();
+        });
+    </script>
+</body>
+</html>
