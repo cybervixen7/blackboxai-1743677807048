@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Gastos | Mi Billetera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex items-center">
+            <a href="index.html" class="mr-4 text-blue-600">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold">Mis Gastos</h1>
+        </div>
+    </header>
+
+    <main class="p-4 space-y-6">
+        <!-- Monthly Summary -->
+        <div class="bg-white rounded-xl shadow-md p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Resumen Mensual</h2>
+                <button id="edit-limit" class="text-blue-600 text-sm">Editar límite</button>
+            </div>
+            
+            <div id="limit-display">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Add Expense Form -->
+        <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Agregar Gasto</h2>
+            <form id="add-expense-form" class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <input type="text" id="expense-description" class="w-full p-2 border border-gray-300 rounded-lg" required 
+                           oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+                        <input type="number" id="expense-amount" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                        <select id="expense-category" class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option value="shopping">Compras</option>
+                            <option value="food">Comida</option>
+                            <option value="transport">Transporte</option>
+                            <option value="entertainment">Entretenimiento</option>
+                        </select>
+                        <select id="expense-card" class="w-full p-2 border border-gray-300 rounded-lg mt-2">
+                            <option value="">Seleccione tarjeta</option>
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium">
+                    Agregar Gasto
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar límite mensual
+            const limit = localStorage.getItem('monthlyLimit') || '2000000';
+            updateLimitDisplay(limit);
+
+            // Configurar botón editar límite
+            document.getElementById('edit-limit').addEventListener('click', function() {
+                const newLimit = prompt('Ingrese nuevo límite mensual:', limit);
+                if(newLimit && !isNaN(newLimit)) {
+                    localStorage.setItem('monthlyLimit', newLimit);
+                    updateLimitDisplay(newLimit);
+                }
+            });
+
+            // Cargar tarjetas
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const cardSelector = document.getElementById('expense-card');
+            
+            cards.forEach(card => {
+                const option = document.createElement('option');
+                option.value = card.id;
+                option.textContent = `${card.type === 'visa' ? 'Visa' : 'Mastercard'} •••• ${card.last4}`;
+                cardSelector.appendChild(option);
+            });
+
+            // Manejar envío de gastos
+            document.getElementById('add-expense-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const expense = {
+                    description: document.getElementById('expense-description').value,
+                    amount: document.getElementById('expense-amount').value,
+                    category: document.getElementById('expense-category').value,
+                    card: document.getElementById('expense-card').value,
+                    date: new Date().toISOString()
+                };
+
+                const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+                expenses.unshift(expense);
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+
+                // Actualizar index.html
+                updateRecentActivity();
+                
+                this.reset();
+                alert('Gasto agregado correctamente');
+            });
+        });
+
+        function updateLimitDisplay(limit) {
+            const spent = 1250000; // Esto debería calcularse de los gastos reales
+            const percentage = Math.min(100, (spent/limit)*100);
+            
+            document.getElementById('limit-display').innerHTML = `
+                <div class="mb-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium">$${(spent/1000).toFixed(0)}.000</span>
+                        <span class="text-sm font-medium text-gray-500">$${(limit/1000).toFixed(0)}.000</span>
+                    </div>
+                    <div class="progress-bar bg-gray-200">
+                        <div class="progress-fill bg-blue-600" style="width: ${percentage}%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">${percentage.toFixed(1)}% del presupuesto usado</p>
+                </div>
+            `;
+        }
+
+        function updateRecentActivity() {
+            // Esta función actualizaría index.html
+            // En una implementación real, podrías usar eventos o recargar la página
+            console.log('Actividad reciente actualizada');
+        }
+    </script>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Inicio</span>
+        </a>
+        <a href="my-cards.html" class="text-gray-500 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">Mis Tarjetas</span>
+        </a>
+        <a href="add-card.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Agregar</span>
+        </a>
+        <a href="my-expenses.html" class="text-blue-600 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Gastos</span>
+        </a>
+    </nav>
+</body>
+</html>
