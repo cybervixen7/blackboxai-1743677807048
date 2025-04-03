@@ -1,0 +1,18 @@
+{
+  "appId": "com.example.wallet",
+  "appName": "My Wallet",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#3b82f6"
+    }
+  },
+  "ios": {
+    "scheme": "WalletApp"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
