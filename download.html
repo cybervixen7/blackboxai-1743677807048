@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descargar Wallet App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .download-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="download-card bg-white rounded-xl p-8 max-w-md w-full">
+        <div class="text-center mb-6">
+            <i class="fas fa-wallet text-5xl text-blue-600 mb-4"></i>
+            <h1 class="text-3xl font-bold text-gray-800">Wallet App</h1>
+            <p class="text-gray-600 mt-2">Versión 1.0.0</p>
+        </div>
+
+        <div class="mb-6">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://tudominio.com/wallet-app.apk" 
+                 alt="QR de descarga" 
+                 class="mx-auto p-2 bg-white rounded-lg border border-gray-200">
+        </div>
+
+        <div class="text-center mb-6">
+            <a href="wallet-app.apk" 
+               download 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg inline-flex items-center transition-colors">
+                <i class="fas fa-download mr-2"></i>
+                Descargar APK
+            </a>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-yellow-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Para instalar, necesitas habilitar "Orígenes desconocidos" en Ajustes > Seguridad
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-sm text-gray-500">
+            <p>© 2023 Devcorps. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
