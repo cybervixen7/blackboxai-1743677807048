@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Gastos | Mi Billetera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex items-center">
+            <a href="index.html" class="mr-4 text-blue-600">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold">Mis Gastos</h1>
+        </div>
+    </header>
+
+    <main class="p-4">
+        <!-- Resumen mensual -->
+        <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Resumen Mensual</h2>
+                <button id="edit-limit" class="text-blue-600 text-sm">Editar límite</button>
+            </div>
+            <div id="limit-display">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Agregar gasto -->
+        <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Agregar Gasto</h2>
+            <form id="add-expense-form" class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <input type="text" id="expense-description" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+                        <input type="number" id="expense-amount" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                        <select id="expense-category" class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option value="food">Comida</option>
+                            <option value="transport">Transporte</option>
+                            <option value="shopping">Compras</option>
+                            <option value="entertainment">Entretenimiento</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium">
+                    Agregar Gasto
+                </button>
+            </form>
+        </div>
+
+        <!-- Historial de gastos -->
+        <div class="bg-white rounded-xl shadow-md p-4">
+            <h2 class="text-lg font-semibold mb-4">Historial de Gastos</h2>
+            <div id="expenses-list">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Inicio</span>
+        </a>
+        <a href="my-cards.html" class="text-gray-500 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">Tarjetas</span>
+        </a>
+        <a href="add-card.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Agregar</span>
+        </a>
+        <a href="my-expenses.html" class="text-blue-600 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Gastos</span>
+        </a>
+    </nav>
+
+    <script>
+        // Cargar límite mensual
+        const loadLimit = () => {
+            const limit = localStorage.getItem('monthlyLimit') || 5000;
+            const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            const currentMonthExpenses = expenses
+                .filter(exp => new Date(exp.date).getMonth() === new Date().getMonth())
+                .reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            
+            const percentage = Math.min(100, (currentMonthExpenses / limit) * 100);
+            
+            document.getElementById('limit-display').innerHTML = `
+                <div class="mb-2">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Gastado: $${currentMonthExpenses.toFixed(2)}</span>
+                        <span>Límite: $${limit}</span>
+                    </div>
+                    <div class="progress-bar bg-gray-200">
+                        <div class="progress-fill bg-blue-600" style="width: ${percentage}%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">${percentage.toFixed(1)}% del presupuesto</p>
+                </div>
+            `;
+        };
+
+        // Cargar gastos
+        const loadExpenses = () => {
+            const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            const expensesList = document.getElementById('expenses-list');
+            
+            expensesList.innerHTML = expenses
+                .map(expense => `
+                    <div class="flex items-center py-3 border-b">
+                        <div class="category-icon ${getCategoryColor(expense.category)} mr-3">
+                            <i class="${getCategoryIcon(expense.category)} text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">${expense.description}</p>
+                            <p class="text-sm text-gray-500">${new Date(expense.date).toLocaleDateString()}</p>
+                        </div>
+                        <p class="font-medium text-red-500">-$${parseFloat(expense.amount).toFixed(2)}</p>
+                    </div>
+                `)
+                .join('');
+        };
+
+        // Obtener icono según categoría
+        const getCategoryIcon = (category) => {
+            const icons = {
+                food: 'fas fa-utensils',
+                transport: 'fas fa-bus',
+                shopping: 'fas fa-shopping-bag',
+                entertainment: 'fas fa-film'
+            };
+            return icons[category] || 'fas fa-receipt';
+        };
+
+        // Obtener color según categoría
+        const getCategoryColor = (category) => {
+            const colors = {
+                food: 'bg-green-500',
+                transport: 'bg-blue-500',
+                shopping: 'bg-purple-500',
+                entertainment: 'bg-yellow-500'
+            };
+            return colors[category] || 'bg-gray-500';
+        };
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLimit();
+            loadExpenses();
+            
+            // Editar límite
+            document.getElementById('edit-limit').addEventListener('click', () => {
+                const currentLimit = localStorage.getItem('monthlyLimit') || 5000;
+                const newLimit = prompt('Ingrese nuevo límite mensual:', currentLimit);
+                if (newLimit && !isNaN(newLimit)) {
+                    localStorage.setItem('monthlyLimit', newLimit);
+                    loadLimit();
+                }
+            });
+            
+            // Agregar gasto
+            document.getElementById('add-expense-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const expense = {
+                    id: Date.now(),
+                    description: document.getElementById('expense-description').value,
+                    amount: parseFloat(document.getElementById('expense-amount').value),
+                    category: document.getElementById('expense-category').value,
+                    date: new Date().toISOString()
+                };
+                
+                const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+                expenses.unshift(expense);
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+                
+                loadLimit();
+                loadExpenses();
+                document.getElementById('add-expense-form').reset();
+            });
+        });
+    </script>
+</body>
+</html>
