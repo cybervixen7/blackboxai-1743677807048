@@ -1,0 +1,23 @@
+{
+  "appId": "com.example.wallet",
+  "appName": "Mi Billetera",
+  "webDir": "www",
+  "icon": "assets/logo.png",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#3b82f6"
+    }
+  },
+  "ios": {
+    "scheme": "WalletApp"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "icon": {
+      "foregroundImage": "assets/logo.png",
+      "backgroundColor": "#3b82f6"
+    }
+  }
+}
