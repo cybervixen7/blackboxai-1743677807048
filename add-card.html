@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Tarjeta | Mi Billetera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .card-preview {
+            border-radius: 1rem;
+            color: white;
+            padding: 1.5rem;
+            margin: 0 auto 1.5rem;
+            max-width: 500px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease;
+        }
+        .card-visa {
+            background: linear-gradient(135deg, #1a237e, #000000);
+        }
+        .card-mastercard {
+            background: linear-gradient(135deg, #ff6d00, #d50000);
+        }
+        .card-default {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex items-center">
+            <a href="my-cards.html" class="mr-4 text-blue-600">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold">Agregar Tarjeta</h1>
+        </div>
+    </header>
+
+    <main class="p-4">
+        <div class="card-preview card-default">
+            <div class="flex justify-between items-center mb-6">
+                <img id="card-logo" src="" class="h-8 opacity-0">
+                <span id="card-number-preview" class="text-xl font-mono">•••• •••• •••• ••••</span>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <p class="text-sm opacity-80">Titular</p>
+                    <p id="card-name-preview" class="font-medium">NOMBRE DEL TITULAR</p>
+                </div>
+                <div>
+                    <p class="text-sm opacity-80">Expira</p>
+                    <p id="card-expiry-preview" class="font-medium">••/••</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 max-w-md mx-auto">
+            <form id="card-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de Tarjeta</label>
+                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" 
+                           class="w-full p-3 border border-gray-300 rounded-lg input-field" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Titular</label>
+                    <input type="text" id="card-name" placeholder="JUAN PEREZ" 
+                           class="w-full p-3 border border-gray-300 rounded-lg input-field" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Expiración</label>
+                        <input type="text" id="card-expiry" placeholder="MM/AA" 
+                               class="w-full p-3 border border-gray-300 rounded-lg input-field" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                        <input type="text" id="card-cvv" placeholder="123" 
+                               class="w-full p-3 border border-gray-300 rounded-lg input-field" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium">
+                    Agregar Tarjeta
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Lógica para actualizar la vista previa
+        document.getElementById('card-number').addEventListener('input', function(e) {
+            const value = e.target.value.replace(/\s/g, '');
+            const formatted = value.replace(/(\d{4})/g, '$1 ').trim();
+            e.target.value = formatted;
+            document.getElementById('card-number-preview').textContent = formatted || '•••• •••• •••• ••••';
+
+            // Detectar tipo de tarjeta y actualizar estilos
+            const cardPreview = document.querySelector('.card-preview');
+            const cardLogo = document.getElementById('card-logo');
+            
+            if (/^4/.test(value)) {
+                cardPreview.className = 'card-preview card-visa';
+                cardLogo.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png';
+                cardLogo.classList.remove('opacity-0');
+            } else if (/^5[1-5]/.test(value)) {
+                cardPreview.className = 'card-preview card-mastercard';
+                cardLogo.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png';
+                cardLogo.classList.remove('opacity-0');
+            } else {
+                cardPreview.className = 'card-preview card-default';
+                cardLogo.classList.add('opacity-0');
+            }
+        });
+
+        document.getElementById('card-name').addEventListener('input', function(e) {
+            document.getElementById('card-name-preview').textContent = 
+                e.target.value.toUpperCase() || 'NOMBRE DEL TITULAR';
+        });
+
+        document.getElementById('card-expiry').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value.substring(0, 5);
+            document.getElementById('card-expiry-preview').textContent = value || '••/••';
+        });
+
+        // Manejar envío del formulario
+        document.getElementById('card-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const cardData = {
+                number: document.getElementById('card-number').value.replace(/\s/g, ''),
+                name: document.getElementById('card-name').value,
+                expiry: document.getElementById('card-expiry').value,
+                cvv: document.getElementById('card-cvv').value,
+                last4: document.getElementById('card-number').value.replace(/\s/g, '').slice(-4),
+                type: document.getElementById('card-number').value.startsWith('4') ? 'visa' : 'mastercard'
+            };
+            
+            // Guardar en localStorage
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            cards.push(cardData);
+            localStorage.setItem('cards', JSON.stringify(cards));
+            
+            // Redirigir
+            window.location.href = 'my-cards.html';
+        });
+    </script>
+
+    <!-- Botonera de navegación -->
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Inicio</span>
+        </a>
+        <a href="my-cards.html" class="text-gray-500 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">Tarjetas</span>
+        </a>
+        <a href="add-card.html" class="text-blue-600 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Agregar</span>
+        </a>
+        <a href="my-expenses.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Gastos</span>
+        </a>
+    </nav>
+</body>
+</html>
