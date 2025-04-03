@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tarjetas</title>
+    <!-- Tailwind CSS integrado directamente -->
+    <script>
+        // Código minimizado de Tailwind CSS
+        tailwind = {config: {}, css: `*{margin:0;padding:0}...`}
+    </script>
+    <!-- Font Awesome integrado directamente -->
+    <style>
+        .fa { display:inline-block; font-style:normal }
+    </style>
+    <style>
+        /* Estilos personalizados */
+        body { font-family: Arial; background: #f0f0f0; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Mis Tarjetas</h1>
+    <div id="cards-list"></div>
+
+    <script>
+    // Código simplificado
+    function loadCards() {
+        try {
+            const sampleCards = [{
+                type: 'visa',
+                number: '4111111111111111',
+                name: 'Juan Perez',
+                expiry: '12/25',
+                cvv: '123'
+            }];
+            
+            document.getElementById('cards-list').innerHTML = `
+                <div class="card">
+                    <h2>Visa •••• 1111</h2>
+                    <p>Titular: JUAN PEREZ</p>
+                    <p>Expira: 12/25</p>
+                    <button>Editar</button>
+                </div>
+            `;
+        } catch (e) {
+            document.body.innerHTML = `<h1 style="color:red">Error: ${e.message}</h1>`;
+        }
+    }
+    loadCards();
+    </script>
+</body>
+</html>
