@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Billetera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .card-visa {
+            background: linear-gradient(135deg, #1a237e, #000000);
+            border-radius: 1rem;
+            color: white;
+            padding: 1.5rem;
+            margin: 0 auto 1.5rem;
+            max-width: 500px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-mastercard {
+            background: linear-gradient(135deg, #ff6d00, #d50000);
+            border-radius: 1rem;
+            color: white;
+            padding: 1.5rem;
+            margin: 0 auto 1.5rem;
+            max-width: 500px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .expense-category {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <h1 class="text-xl font-bold">Mi Billetera</h1>
+    </header>
+
+    <main class="p-4">
+        <!-- Selector de tarjeta -->
+        <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Tarjeta Principal</h2>
+            <select id="main-card-select" class="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                <!-- Opciones se cargarán dinámicamente -->
+            </select>
+            
+            <!-- Tarjeta seleccionada -->
+            <div id="selected-card-display" class="card-visa p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <img id="selected-card-logo" src="" class="h-8 opacity-0">
+                    <span id="selected-card-number" class="text-xl font-mono">•••• •••• •••• ••••</span>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <p class="text-sm opacity-80">Titular</p>
+                        <p id="selected-card-name" class="font-medium">NOMBRE DEL TITULAR</p>
+                    </div>
+                    <div>
+                        <p class="text-sm opacity-80">Expira</p>
+                        <p id="selected-card-expiry" class="font-medium">••/••</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accesos rápidos -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <a href="my-cards.html" class="bg-white p-4 rounded-xl shadow-md text-center">
+                <i class="fas fa-credit-card text-blue-500 text-2xl mb-2"></i>
+                <p>Mis Tarjetas</p>
+            </a>
+            <a href="my-expenses.html" class="bg-white p-4 rounded-xl shadow-md text-center">
+                <i class="fas fa-chart-pie text-green-500 text-2xl mb-2"></i>
+                <p>Mis Gastos</p>
+            </a>
+        </div>
+
+        <!-- Últimos movimientos -->
+        <div class="bg-white rounded-xl shadow-md p-4">
+            <h2 class="text-lg font-semibold mb-4">Últimos Gastos</h2>
+            <div id="last-expenses">
+                <!-- Se cargarán dinámicamente -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-blue-600 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Inicio</span>
+        </a>
+        <a href="my-cards.html" class="text-gray-500 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">Tarjetas</span>
+        </a>
+        <a href="add-card.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Agregar</span>
+        </a>
+        <a href="my-expenses.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Gastos</span>
+        </a>
+    </nav>
+
+    <script>
+        // Cargar tarjetas y seleccionar principal
+        const loadCards = () => {
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const select = document.getElementById('main-card-select');
+            const mainCardId = localStorage.getItem('mainCardId');
+            
+            select.innerHTML = cards.map(card => 
+                `<option value="${card.number}" ${mainCardId === card.number ? 'selected' : ''}>
+                    ${card.type === 'visa' ? 'Visa' : 'Mastercard'} •••• ${card.last4}
+                </option>`
+            ).join('') || '<option value="">No hay tarjetas</option>';
+            
+            updateSelectedCardDisplay();
+        };
+
+        // Actualizar visualización de tarjeta seleccionada
+        const updateSelectedCardDisplay = () => {
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const selectedNumber = document.getElementById('main-card-select').value;
+            const card = cards.find(c => c.number === selectedNumber);
+            const cardDisplay = document.getElementById('selected-card-display');
+            
+            if (card) {
+                // Actualizar clase CSS según el tipo de tarjeta
+                cardDisplay.className = card.type === 'visa' ? 'card-visa p-6' : 'card-mastercard p-6';
+                
+                document.getElementById('selected-card-number').textContent = 
+                    `•••• •••• •••• ${card.last4}`;
+                document.getElementById('selected-card-name').textContent = 
+                    card.name.toUpperCase();
+                document.getElementById('selected-card-expiry').textContent = 
+                    card.expiry;
+                const logoUrl = card.type === 'visa' 
+                    ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png'
+                    : 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png';
+                
+                const logoImg = document.getElementById('selected-card-logo');
+                logoImg.src = logoUrl;
+                logoImg.classList.remove('opacity-0');
+                logoImg.classList.add('h-8');
+                
+                localStorage.setItem('mainCardId', card.number);
+            }
+        };
+
+        // Cargar últimos gastos
+        const loadLastExpenses = () => {
+            const expenses = JSON.parse(localStorage.getItem('expenses') || '[]')
+                .slice(0, 5); // Mostrar solo los 5 más recientes
+            
+            const expensesList = document.getElementById('last-expenses');
+            
+            expensesList.innerHTML = expenses.map(expense => `
+                <div class="flex items-center py-3 border-b">
+                    <div class="expense-category ${getCategoryColor(expense.category)} mr-3">
+                        <i class="${getCategoryIcon(expense.category)} text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">${expense.description}</p>
+                        <p class="text-sm text-gray-500">${new Date(expense.date).toLocaleDateString()}</p>
+                    </div>
+                    <p class="font-medium text-red-500">-$${parseFloat(expense.amount).toFixed(2)}</p>
+                </div>
+            `).join('') || '<p class="text-gray-500 text-center py-4">No hay gastos recientes</p>';
+        };
+
+        // Funciones auxiliares
+        const getCategoryIcon = (category) => {
+            const icons = {
+                food: 'fas fa-utensils',
+                transport: 'fas fa-bus',
+                shopping: 'fas fa-shopping-bag',
+                entertainment: 'fas fa-film'
+            };
+            return icons[category] || 'fas fa-receipt';
+        };
+
+        const getCategoryColor = (category) => {
+            const colors = {
+                food: 'bg-green-500',
+                transport: 'bg-blue-500',
+                shopping: 'bg-purple-500',
+                entertainment: 'bg-yellow-500'
+            };
+            return colors[category] || 'bg-gray-500';
+        };
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCards();
+            loadLastExpenses();
+            
+            document.getElementById('main-card-select').addEventListener('change', updateSelectedCardDisplay);
+        });
+    </script>
+</body>
+</html>
