@@ -6,56 +6,177 @@
     <title>Descargar Wallet App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Descarga Wallet App - La mejor aplicación para gestionar tus finanzas personales">
+    <meta property="og:title" content="Descarga Wallet App - Gestión Financiera">
+    <meta property="og:description" content="Gestiona tus finanzas de manera segura y eficiente con Wallet App. Disponible para Android.">
     <style>
         .download-card {
             transition: all 0.3s ease;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #e9f4fd 0%, #ffffff 100%);
         }
         .download-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
+        .download-btn {
+            transition: all 0.2s ease;
+        }
+        .download-btn:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="download-card bg-white rounded-xl p-8 max-w-md w-full">
+    <div class="download-card bg-white rounded-xl p-8 max-w-2xl w-full">
         <div class="text-center mb-6">
             <i class="fas fa-wallet text-5xl text-blue-600 mb-4"></i>
             <h1 class="text-3xl font-bold text-gray-800">Wallet App</h1>
             <p class="text-gray-600 mt-2">Versión 1.0.0</p>
         </div>
 
-        <div class="mb-6">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://tudominio.com/wallet-app.apk" 
-                 alt="QR de descarga" 
-                 class="mx-auto p-2 bg-white rounded-lg border border-gray-200">
+        <!-- Error Message -->
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <span class="block sm:inline">¡Error! No se pudo descargar la aplicación.</span>
         </div>
 
-        <div class="text-center mb-6">
-            <a href="wallet-app.apk" 
-               download 
-               class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg inline-flex items-center transition-colors">
-                <i class="fas fa-download mr-2"></i>
-                Descargar APK
-            </a>
+        <!-- Download Progress -->
+        <div class="hidden mb-4" id="download-progress">
+            <div class="bg-blue-200 rounded-full h-2.5">
+                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-1">Descargando...</p>
         </div>
 
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-circle text-yellow-400"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
-                        Para instalar, necesitas habilitar "Orígenes desconocidos" en Ajustes > Seguridad
-                    </p>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="flex flex-col items-center justify-center">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=file:///project/sandbox/user-workspace/www/wallet-app.apk" 
+                     alt="QR de descarga" 
+                     class="mx-auto p-2 bg-white rounded-lg border border-gray-200">
+                <p class="text-sm text-gray-500 mt-2">Escanea para descargar</p>
+            </div>
+
+            <div class="flex flex-col items-center justify-center space-y-4">
+                <a href="www/wallet-app.apk" 
+                   download 
+                   class="download-btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg inline-flex items-center transition-colors group"
+                   aria-label="Descargar aplicación">
+                    <i class="fas fa-download mr-2 transform group-hover:translate-y-0.5"></i>
+                    Descargar APK (25MB)
+                </a>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-500">Compatibilidad: Android 8.0+</p>
                 </div>
             </div>
         </div>
 
-        <div class="text-center text-sm text-gray-500">
+        <!-- Installation Guide -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6 rounded">
+            <h3 class="font-bold text-lg text-gray-800 mb-3">Guía de instalación</h3>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-medium">1. Habilitar Orígenes Desconocidos</p>
+                        <p class="text-sm text-gray-600">Ajustes > Seguridad > Orígenes Desconocidos</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-medium">2. Descargar el archivo APK</p>
+                        <p class="text-sm text-gray-600">Haz clic en el botón de arriba</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-medium">3. Abrir el archivo descargado</p>
+                        <p class="text-sm text-gray-600">Desde tu gestor de archivos o notificaciones</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-medium">4. Seguir las instrucciones de instalación</p>
+                        <p class="text-sm text-gray-600">Aceptar los permisos requeridos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testimonials -->
+        <div class="bg-white rounded-lg p-6 mt-6 shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold mb-4 text-center">Usuarios dicen:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-12 h-12 rounded-full mb-3">
+                    <p class="text-gray-700 text-sm">"¡Excelente app para gestionar mis finanzas!"</p>
+                    <p class="text-gray-500 text-xs mt-2">- María G.</p>
+                </div>
+                <div class="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-12 h-12 rounded-full mb-3">
+                    <p class="text-gray-700 text-sm">"Muy intuitiva y fácil de usar"</p>
+                    <p class="text-gray-500 text-xs mt-2">- Carlos R.</p>
+                </div>
+                <div class="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="w-12 h-12 rounded-full mb-3">
+                    <p class="text-gray-700 text-sm">"Me ayuda a controlar mis gastos"</p>
+                    <p class="text-gray-500 text-xs mt-2">- Laura M.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-sm text-gray-500 mt-8">
             <p>© 2023 Devcorps. Todos los derechos reservados.</p>
         </div>
     </div>
+
+    <script>
+        // Download tracking
+        document.querySelector('a[download]').addEventListener('click', (e) => {
+            const progress = document.getElementById('download-progress');
+            const errorMsg = document.getElementById('error-message');
+            
+            // Reset UI
+            errorMsg.classList.add('hidden');
+            progress.style.display = 'block';
+            
+            // Simulate progress (in real app, use actual download progress)
+            const progressBar = progress.querySelector('div > div');
+            progressBar.style.width = '0%';
+            
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 10;
+                progressBar.style.width = `${width}%`;
+                
+                if (width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progress.style.display = 'none';
+                    }, 500);
+                }
+            }, 200);
+            
+            // Track download event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'download_click', {
+                    'event_category': 'APK Download',
+                    'event_label': 'Android APK Download'
+                });
+            }
+        });
+
+        // Error handling
+        window.addEventListener('error', (e) => {
+            if (e.filename.includes('wallet-app.apk')) {
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('download-progress').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
