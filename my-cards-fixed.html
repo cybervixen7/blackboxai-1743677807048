@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tarjetas | Mi Billetera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .card-visa {
+            background: linear-gradient(135deg, #1a237e, #000000);
+            border-radius: 1rem;
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-mastercard {
+            background: linear-gradient(135deg, #ff6d00, #d50000);
+            border-radius: 1rem;
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex items-center">
+            <a href="index.html" class="mr-4 text-blue-600">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold">Mis Tarjetas</h1>
+        </div>
+    </header>
+
+    <main class="p-4">
+        <div id="cards-list" class="space-y-4">
+            <!-- Las tarjetas se cargarán aquí dinámicamente -->
+        </div>
+        
+        <a href="add-card.html" class="fixed bottom-20 right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg">
+            <i class="fas fa-plus text-xl"></i>
+        </a>
+    </main>
+
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Inicio</span>
+        </a>
+        <a href="my-cards.html" class="text-blue-600 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">Tarjetas</span>
+        </a>
+        <a href="add-card.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Agregar</span>
+        </a>
+        <a href="my-expenses.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Gastos</span>
+        </a>
+    </nav>
+
+    <script>
+        // Cargar tarjetas con manejo de errores
+        const loadCards = () => {
+            try {
+                const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+                const cardsList = document.getElementById('cards-list');
+                
+                if(!cardsList) {
+                    console.error('No se encontró el contenedor de tarjetas');
+                    return;
+                }
+
+                if(cards.length === 0) {
+                    cardsList.innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-gray-500 mb-4">No tienes tarjetas guardadas</p>
+                            <a href="add-card.html" class="text-blue-600 font-medium">Agregar una tarjeta</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                cardsList.innerHTML = cards.map(card => `
+                    <div class="${card.type === 'visa' ? 'card-visa' : 'card-mastercard'}">
+                        <div class="flex justify-between items-center mb-6">
+                            <img src="${card.type === 'visa' ? 'visa-logo.png' : 'mastercard-logo.png'}" class="h-8">
+                            <span class="text-xl font-mono">•••• •••• •••• ${card.last4 || '••••'}</span>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-sm opacity-80">Titular</p>
+                                <p class="font-medium">${card.name?.toUpperCase() || 'NOMBRE DEL TITULAR'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm opacity-80">Expira</p>
+                                <p class="font-medium">${card.expiry || '••/••'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error al cargar tarjetas:', error);
+                const cardsList = document.getElementById('cards-list');
+                if(cardsList) {
+                    cardsList.innerHTML = `
+                        <div class="text-center py-8 text-red-500">
+                            <p>Error al cargar las tarjetas. Por favor recarga la página.</p>
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', loadCards);
+    </script>
+</body>
+</html>
