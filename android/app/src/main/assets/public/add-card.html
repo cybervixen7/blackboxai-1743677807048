@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Card | Wallet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .card-preview {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 16px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .input-field {
+            transition: border-color 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-16">
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex items-center">
+            <a href="my-cards.html" class="mr-4 text-blue-600">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold">Add New Card</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4">
+        <!-- Card Preview -->
+        <div class="card-preview p-6 shadow-lg mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <img id="card-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" class="h-8">
+                <span id="card-last4" class="text-xl font-mono">•••• ••••</span>
+            </div>
+            <div class="mb-4">
+                <p class="text-sm opacity-80">Card Number</p>
+                <p id="card-number" class="text-xl font-medium tracking-wider">•••• •••• •••• ••••</p>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <p class="text-sm opacity-80">Card Holder</p>
+                    <p id="card-holder" class="font-medium">FULL NAME</p>
+                </div>
+                <div>
+                    <p class="text-sm opacity-80">Expires</p>
+                    <p id="card-expiry" class="font-medium">••/••</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Card Form -->
+        <form id="card-form" class="space-y-4">
+            <div>
+                <label for="card-number-input" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                <input type="text" id="card-number-input" placeholder="1234 5678 9012 3456" 
+                    class="w-full p-3 border border-gray-300 rounded-lg input-field" 
+                    maxlength="19" pattern="[0-9\s]{13,19}" required>
+            </div>
+
+            <div>
+                <label for="card-name" class="block text-sm font-medium text-gray-700 mb-1">Card Holder Name</label>
+                <input type="text" id="card-name" placeholder="John Doe" 
+                    class="w-full p-3 border border-gray-300 rounded-lg input-field" required>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="card-expiry-input" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                    <input type="text" id="card-expiry-input" placeholder="MM/YY" 
+                        class="w-full p-3 border border-gray-300 rounded-lg input-field" 
+                        maxlength="5" pattern="\d{2}/\d{2}" required>
+                </div>
+                <div>
+                    <label for="card-cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                    <input type="text" id="card-cvv" placeholder="•••" 
+                        class="w-full p-3 border border-gray-300 rounded-lg input-field" 
+                        maxlength="3" pattern="\d{3}" required>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                Add Card
+            </button>
+        </form>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg flex justify-around p-3">
+        <a href="index.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Home</span>
+        </a>
+        <a href="my-cards.html" class="text-gray-500 flex flex-col items-center">
+            <i class="far fa-credit-card text-xl"></i>
+            <span class="text-xs mt-1">My Cards</span>
+        </a>
+        <a href="add-card.html" class="text-blue-600 flex flex-col items-center">
+            <i class="fas fa-plus-circle text-xl"></i>
+            <span class="text-xs mt-1">Add Card</span>
+        </a>
+        <a href="my-expenses.html" class="text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl"></i>
+            <span class="text-xs mt-1">Expenses</span>
+        </a>
+    </nav>
+
+    <script>
+        // Card preview updates
+        const cardNumberInput = document.getElementById('card-number-input');
+        const cardNameInput = document.getElementById('card-name');
+        const cardExpiryInput = document.getElementById('card-expiry-input');
+        const cardPreviewNumber = document.getElementById('card-number');
+        const cardPreviewHolder = document.getElementById('card-holder');
+        const cardPreviewExpiry = document.getElementById('card-expiry');
+        const cardPreviewLast4 = document.getElementById('card-last4');
+        const cardLogo = document.getElementById('card-logo');
+
+        // Format card number input
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formatted = value.replace(/(\d{4})/g, '$1 ').trim();
+            e.target.value = formatted;
+            
+            // Update preview
+            if (value.length > 0) {
+                let visible = formatted.substring(0, formatted.length - 4).replace(/\d/g, '•') + 
+                             formatted.substring(formatted.length - 4);
+                cardPreviewNumber.textContent = visible || '•••• •••• •••• ••••';
+                cardPreviewLast4.textContent = '•••• ' + (value.length > 12 ? value.slice(-4) : '••••');
+                
+                // Detect card type
+                if (/^4/.test(value)) {
+                    cardLogo.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png';
+                } else if (/^5[1-5]/.test(value)) {
+                    cardLogo.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png';
+                }
+            } else {
+                cardPreviewNumber.textContent = '•••• •••• •••• ••••';
+                cardPreviewLast4.textContent = '•••• ••••';
+            }
+        });
+
+        // Update card holder name
+        cardNameInput.addEventListener('input', function(e) {
+            cardPreviewHolder.textContent = e.target.value.toUpperCase() || 'FULL NAME';
+        });
+
+        // Format expiry date
+        cardExpiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+            cardPreviewExpiry.textContent = value || '••/••';
+        });
+
+        // Form submission
+        document.getElementById('card-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Card added successfully!');
+            window.location.href = 'my-cards.html';
+        });
+    </script>
+</body>
+</html>
